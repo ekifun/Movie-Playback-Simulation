@@ -1,12 +1,11 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 
-const AdRecommendations = () => {
-  const [userID, setUserID] = useState("demo_user"); // Default user ID
+const AdRecommendations = ({ userID, triggerAdRefresh }) => {
   const [ads, setAds] = useState([]);
   const [error, setError] = useState("");
 
-  // Fetch Ads function
+  // Fetch ads from the backend
   const fetchAds = async () => {
     try {
       const response = await axios.get(`http://localhost:8082/recommend?userID=${userID}`);
@@ -18,30 +17,15 @@ const AdRecommendations = () => {
     }
   };
 
+  // Fetch ads when the component mounts or `triggerAdRefresh` changes
   useEffect(() => {
     fetchAds();
-  }, [userID]);
+  }, [triggerAdRefresh, userID]);
 
   return (
     <div>
-      <h2>Ad Recommendation System</h2>
-
-      {/* User ID Input */}
-      <div>
-        <label htmlFor="userID">User ID:</label>
-        <input
-          type="text"
-          id="userID"
-          value={userID}
-          onChange={(e) => setUserID(e.target.value)}
-        />
-        <button onClick={fetchAds}>Fetch Ads</button>
-      </div>
-
-      {/* Error Message */}
+      <h2>Recommended Ads</h2>
       {error && <p style={{ color: "red" }}>{error}</p>}
-
-      {/* Ads List */}
       {ads.length > 0 ? (
         <ul>
           {ads.map((ad) => (

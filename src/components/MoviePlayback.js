@@ -1,8 +1,7 @@
 import React, { useState } from "react";
 import axios from "axios";
 
-const MoviePlayback = () => {
-  const [userID, setUserID] = useState("user"); // Default user ID
+const MoviePlayback = ({ userID, onPlaybackComplete }) => {
   const [category, setCategory] = useState(""); // Selected category
   const [message, setMessage] = useState(""); // Success or error message
 
@@ -21,6 +20,7 @@ const MoviePlayback = () => {
       .post("http://localhost:8082/playback", { userID, category })
       .then((response) => {
         setMessage("Playback data submitted: " + response.data);
+        onPlaybackComplete(); // Notify parent to refresh ads
       })
       .catch((error) => {
         setMessage("Playback submission failed. Please try again.");
@@ -32,15 +32,6 @@ const MoviePlayback = () => {
     <div>
       <h2>Movie Playback Simulation</h2>
       <form onSubmit={handleSubmit}>
-        <label htmlFor="userID">User ID:</label>
-        <input
-          type="text"
-          id="userID"
-          value={userID}
-          onChange={(e) => setUserID(e.target.value)}
-          placeholder="Enter User ID"
-        />
-
         <label htmlFor="category">Category:</label>
         <select
           id="category"
