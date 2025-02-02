@@ -1,27 +1,41 @@
-import React, { useState } from "react";
-import AdRecommendations from "./components/AdRecommendations";
+import React, { useState } from 'react';
 import MoviePlayback from "./components/MoviePlayback";
+import AdRecommendations from "./components/AdRecommendations";
 
-const App = () => {
-  const [userID] = useState("demo_user"); // Default user ID
-  const [refreshTrigger, setRefreshTrigger] = useState(false); // Trigger to refresh ads
+function App() {
+    const [recommendedAds, setRecommendedAds] = useState([]);
 
-  // Callback to handle playback completion
-  const handlePlaybackComplete = () => {
-    setRefreshTrigger((prev) => !prev); // Toggle trigger to refresh ads
-  };
+    // Function to handle playback simulation and fetch recommended ads
+    const handlePlayback = async (userId, movieCategory) => {
+        console.log(`Simulating playback for user: ${userId}, category: ${movieCategory}`);
+        
+        try {
+            const response = await fetch('http://localhost:8082/recommend', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ user_id: userId }),
+            });
+            
+            if (!response.ok) {
+                throw new Error('Failed to fetch recommendations');
+            }
 
-  return (
-    <div>
-      <h1>Ad Recommendation System</h1>
+            const data = await response.json();
+            setRecommendedAds(data);
+        } catch (error) {
+            console.error('Error fetching recommendations:', error);
+        }
+    };
 
-      {/* Movie Playback */}
-      <MoviePlayback userID={userID} onPlaybackComplete={handlePlaybackComplete} />
-
-      {/* Ad Recommendations */}
-      <AdRecommendations userID={userID} triggerAdRefresh={refreshTrigger} />
-    </div>
-  );
-};
+    return (
+        <div>
+            <h1>Movie Streaming Platform</h1>
+            <MoviePlayback onPlayback={handlePlayback} />
+            <AdRecommendations ads={recommendedAds} />
+        </div>
+    );
+}
 
 export default App;

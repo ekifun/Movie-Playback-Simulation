@@ -1,26 +1,33 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 
-const AdRecommendations = ({ userID, triggerAdRefresh }) => {
+const AdRecommendations = ({ userID, refreshTrigger }) => {
   const [ads, setAds] = useState([]);
   const [error, setError] = useState("");
 
-  // Fetch ads from the backend
-  const fetchAds = async () => {
+  // Fetch recommendations from the backend
+  const fetchRecommendations = async () => {
+    if (!userID) return;
+
+    console.log("🟢 Fetching recommendations for user:", userID);
     try {
-      const response = await axios.get(`http://localhost:8082/recommend?userID=${userID}`);
+      const response = await axios.post("http://localhost:8082/recommend", {
+        user_id: userID,
+      });
+
+      console.log("✅ Recommended Ads Received:", response.data);
       setAds(response.data);
       setError("");
     } catch (err) {
-      console.error("Failed to fetch recommendations:", err);
+      console.error("❌ Failed to fetch recommendations:", err);
       setError("Failed to fetch recommendations.");
     }
   };
 
-  // Fetch ads when the component mounts or `triggerAdRefresh` changes
+  // Refetch when `userID` or `refreshTrigger` changes
   useEffect(() => {
-    fetchAds();
-  }, [triggerAdRefresh, userID]);
+    fetchRecommendations();
+  }, [userID, refreshTrigger]); // ✅ Ensures refetch on new playback
 
   return (
     <div>
